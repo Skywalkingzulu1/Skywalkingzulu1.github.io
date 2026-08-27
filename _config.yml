@@ -1,0 +1,10 @@
+title: Skywalkingzulu1 — Investor Research Library
+description: >-
+  Independent intelligence on 52 early-stage venture firms across Gauteng —
+  profiles, key people, portfolios, contact strategy and pitch hooks.
+baseurl: ""
+url: "https://skywalkingzulu1.github.io"
+permalink: pretty
+markdown: kramdown
+theme: minima
+show_excerpts: true
