@@ -55,20 +55,20 @@ canvas.bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events
 <script>
 const SHADERS={
 health:`@group(0) @binding(0) var<uniform> u:vec4f;
-@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;return vec4f(p.x+sin(t+p.y*3.)*.15, p.y+cos(t+p.x*3.)*.15,0,1);}
-@fragment fn fs()->@location(0) vec4f{return vec4f(.0,.7,.5,.9);}`,
+@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;return vec4f(p.x+sin(t+p.y*4.)*.12, p.y+cos(t*1.3+p.x*4.)*.12,0,1);}
+@fragment fn fs()->@location(0) vec4f{return vec4f(.0,.85,.55,.95);}`,
 rust:`@group(0) @binding(0) var<uniform> u:vec4f;
-@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;let a=p.x*6.+t;return vec4f(p.x, sin(a)*.6+p.y,0,1);}
-@fragment fn fs()->@location(0) vec4f{return vec4f(.9,.4,.1,.9);}`,
+@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;let a=p.x*8.+t;return vec4f(p.x, sin(a)*.5+p.y+cos(t+p.x*3.)*.1,0,1);}
+@fragment fn fs()->@location(0) vec4f{return vec4f(.95,.5,.12,.95);}`,
 grid:`@group(0) @binding(0) var<uniform> u:vec4f;
-@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;return vec4f(p.x, p.y+sin(t+p.x*5.)*.12,0,1);}
-@fragment fn fs()->@location(0) vec4f{return vec4f(.0,.32,.8,.9);}`,
+@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;return vec4f(p.x, p.y+sin(t*1.5+p.x*8.)*.08,0,1);}
+@fragment fn fs()->@location(0) vec4f{return vec4f(.1,.45,.95,.95);}`,
 wave:`@group(0) @binding(0) var<uniform> u:vec4f;
-@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;return vec4f(p.x, sin(p.x*6.+t)*.5+p.y,0,1);}
-@fragment fn fs()->@location(0) vec4f{return vec4f(.0,.76,.66,.9);}`,
+@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;return vec4f(p.x, sin(p.x*7.+t)*.55+p.y+cos(t*2.+p.x*3.)*.08,0,1);}
+@fragment fn fs()->@location(0) vec4f{return vec4f(.0,.8,.7,.95);}`,
 shield:`@group(0) @binding(0) var<uniform> u:vec4f;
-@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;let r=length(p.xy);return vec4f(p.x*(1.+sin(t+r*6.)*.05), p.y*(1.+cos(t+r*6.)*.05),0,1);}
-@fragment fn fs()->@location(0) vec4f{return vec4f(.7,.2,.9,.9);}`
+@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u.x;let r=length(p.xy);let ang=t+r*4.;return vec4f(cos(ang)*r*.9, sin(ang)*r*.9,0,1);}
+@fragment fn fs()->@location(0) vec4f{return vec4f(.55,.2,.95,.95);}`
 };
 async function makeCard(canvas,mode){
   if(!navigator.gpu) return;
