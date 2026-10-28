@@ -187,5 +187,35 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--fg)
 const io=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target)}})},{threshold:.15});
 document.querySelectorAll('.card').forEach(c=>io.observe(c));
 </script>
+<canvas id="gpu" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:.35"></canvas>
+<script>
+(async()=>{
+  if(!navigator.gpu) return;
+  const canvas=document.getElementById('gpu');
+  const adapter=await navigator.gpu.requestAdapter();
+  const device=await adapter.requestDevice();
+  const ctx=canvas.getContext('webgpu');
+  const fmt=navigator.gpu.getPreferredCanvasFormat();
+  const resize=()=>{canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio};
+  resize(); addEventListener('resize',resize);
+  ctx.configure({device,format:fmt,alphaMode:'premultiplied'});
+  const N=2000;
+  const data=new Float32Array(N*4);
+  for(let i=0;i<N;i++){data[i*4]=Math.random()*2-1;data[i*4+1]=Math.random()*2-1;data[i*4+2]=Math.random()*2-1;data[i*4+3]=1}
+  const buf=device.createBuffer({size:data.byteLength,usage:GPUBufferUsage.VERTEX|GPUBufferUsage.COPY_DST});
+  device.queue.writeBuffer(buf,0,data);
+  const code=`@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{return p;} @fragment fn fs()->@location(0) vec4f{return vec4f(0,.32,.8,1);}`;
+  const mod=device.createShaderModule({code});
+  const pipe=device.createRenderPipeline({layout:'auto',vertex:{module:mod,entryPoint:'vs',buffers:[{arrayStride:16,attributes:[{shaderLocation:0,offset:0,format:'float32x4'}]}]},fragment:{module:mod,entryPoint:'fs',targets:[{format:fmt}]},primitive:{topology:'point-list'}});
+  function frame(){
+    const enc=device.createCommandEncoder();
+    const pass=enc.beginRenderPass({colorAttachments:[{view:ctx.getCurrentTexture().createView(),clearValue:{r:0,g:0,b:0,a:0},loadOp:'clear',storeOp:'store'}]});
+    pass.setPipeline(pipe);pass.setVertexBuffer(0,buf);pass.draw(N);pass.end();
+    device.queue.submit([enc.finish()]);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
