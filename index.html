@@ -111,8 +111,8 @@ async function makeCard(canvas,mode){
   const bgl=device.createBindGroupLayout({entries:[{binding:0,visibility:GPUShaderStage.VERTEX|GPUShaderStage.FRAGMENT,buffer:{type:'uniform'}}]});
   const bg=device.createBindGroup({layout:bgl,entries:[{binding:0,resource:{buffer:ubuf}}]});
   const code=`@group(0) @binding(0) var<uniform> u:array<f32,8>;
-@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u[0];let c=cos(t*.35);let s=sin(t*.35);var x=p.x*c-p.z*s;var z=p.x*s+p.z*c;let y=p.y+sin(t*1.2+p.x*3.)*.06;return vec4f(x*.55,y*.55,z*.55,1);}
-@fragment fn fs(@builtin(position) c:vec4f)->@location(0) vec4f{let n=sin(c.x*.02+u[0])*.5+.5;let col=mix(vec3f(0,.2,.7),vec3f(0,.76,.66),n);return vec4f(col,.7);}`;
+@vertex fn vs(@location(0) p:vec4f)->@builtin(position) vec4f{let t=u[0];let c=cos(t*.25);let s=sin(t*.25);var x=p.x*c-p.z*s;var z=p.x*s+p.z*c;let y=p.y+sin(t*1.5+p.x*4.)*.1;let pulse=1.+sin(t*2.+length(p.xy)*6.)*.04;return vec4f(x*pulse*.58,y*pulse*.58,z*pulse*.58,1);}
+@fragment fn fs(@builtin(position) c:vec4f)->@location(0) vec4f{let n=sin(c.x*.015+u[0]*.8)*.5+.5;let col=mix(vec3f(.05,.15,.5),vec3f(.0,.7,.8),n);let glow=exp(-length(c.xy-vec2f(u[3],u[4]))*.004);return vec4f(col+glow*.4,.75);}`;
   const mod=device.createShaderModule({code});
   const pipe=device.createRenderPipeline({layout:device.createPipelineLayout({bindGroupLayouts:[bgl]}),vertex:{module:mod,entryPoint:'vs',buffers:[{arrayStride:16,attributes:[{shaderLocation:0,offset:0,format:'float32x4'}]}]},fragment:{module:mod,entryPoint:'fs',targets:[{format:fmt}]},primitive:{topology:'point-list'}});
   let t=0;
